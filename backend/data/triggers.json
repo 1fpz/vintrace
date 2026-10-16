@@ -1,0 +1,16 @@
+{
+  "vintrace001": {
+    "temperature": {
+      "min": 10.0,
+      "max": 18.0
+    },
+    "humidity": {
+      "min": 60.0,
+      "max": 80.0
+    },
+    "luminosity": {
+      "min": 0.0,
+      "max": 20.0
+    }
+  }
+}

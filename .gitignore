@@ -1,0 +1,26 @@
+# Secrets and environment
+.env
+.env.*
+!.env.example
+**/secrets.h
+**/.venv/
+**/venv/
+**/__pycache__/
+*.py[cod]
+
+# Node
+**/node_modules/
+**/dist/
+**/.vite/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Generated
+*.log
+**/.pytest_cache/
+**/.mypy_cache/
+extract_paginas.json

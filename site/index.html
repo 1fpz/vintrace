@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#171a16" />
+  <meta name="description" content="VinTrace — monitoramento inteligente de condições ambientais para adegas com IoT, FIWARE e histórico de sensores." />
+  <title>VinTrace — Preserve o que importa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="nav wrap">
+    <a class="brand" href="#inicio" aria-label="VinTrace início"><span class="brand-mark">V</span><span>vintrace<span class="brand-dot">.</span></span></a>
+    <nav><a href="#solucao">Solução</a><a href="#demo">Demo</a><a href="#arquitetura">Arquitetura</a><a href="#equipe">Equipe</a></nav>
+    <a class="nav-cta" href="#demo">Explorar demo <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <main>
+    <section class="hero wrap" id="inicio">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="pulse"></span> MONITORAMENTO INTELIGENTE · IOT</div>
+        <h1>Preserve o que importa.<br><em>Antecipe o que muda.</em></h1>
+        <p class="hero-lede">Uma nova forma de acompanhar as condições da sua adega — com sensores, histórico ambiental e alertas que ajudam você a agir antes que uma variação passe despercebida.</p>
+        <div class="hero-actions"><a class="button primary" href="#demo">Ver demonstração <span>↓</span></a><a class="text-link" href="#arquitetura">Conhecer a arquitetura <span>→</span></a></div>
+        <div class="hero-proof"><div class="avatars"><span>IoT</span><span>API</span><span>UX</span></div><p>Hardware + dados + uma visão clara<br><b>Projeto acadêmico CP5 · 2026</b></p></div>
+      </div>
+      <div class="hero-visual" aria-label="Prévia ilustrativa do painel VinTrace">
+        <div class="visual-top"><div><span class="tiny-label">VINTRACE / ADEGA PRINCIPAL</span><h3>Condição ambiental</h3></div><span class="demo-chip"><i></i> DEMO</span></div>
+        <div class="visual-status"><span class="status-icon">✓</span><div><b>Ambiente estável</b><small>Parâmetros dentro das faixas demonstrativas</small></div><span class="status-live">SIMULADO</span></div>
+        <div class="metric-grid">
+          <article class="metric"><span class="metric-name"><span class="metric-icon warm">↗</span> Temperatura</span><strong>14,2<span>°C</span></strong><div class="meter"><i style="width:54%"></i></div><small>Faixa de exemplo: 10–18 °C</small></article>
+          <article class="metric"><span class="metric-name"><span class="metric-icon blue">≈</span> Umidade</span><strong>67<span>%</span></strong><div class="meter blue-meter"><i style="width:67%"></i></div><small>Faixa de exemplo: 50–75%</small></article>
+          <article class="metric metric-wide"><div><span class="metric-name"><span class="metric-icon green">☼</span> Luminosidade</span><strong>22<span>%</span></strong></div><div class="mini-chart"><svg viewBox="0 0 300 58" role="img" aria-label="Gráfico ilustrativo de luminosidade"><path d="M0 42 C22 36 28 45 48 33 S82 27 101 36 S131 18 150 26 S180 37 198 22 S232 30 251 16 S280 19 300 8" fill="none" stroke="#b9d29b" stroke-width="2.5"/><path d="M0 42 C22 36 28 45 48 33 S82 27 101 36 S131 18 150 26 S180 37 198 22 S232 30 251 16 S280 19 300 8 L300 58 L0 58Z" fill="url(#fade)"/><defs><linearGradient id="fade" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#b9d29b" stop-opacity=".24"/><stop offset="1" stop-color="#b9d29b" stop-opacity="0"/></linearGradient></defs></svg></div><small>Visualização conceitual · sem sensor conectado</small></article>
+        </div>
+        <div class="visual-bottom"><span><i class="dot-green"></i> Interface de demonstração</span><span>Dados fictícios · não representam uma adega real</span></div>
+      </div>
+      <div class="hero-orb orb-one"></div><div class="hero-orb orb-two"></div>
+    </section>
+
+    <section class="trust-strip"><div class="wrap strip-inner"><span>DESENVOLVIDO COM</span><b>ESP32 <i>·</i> Sensores</b><b>FIWARE <i>·</i> Contexto</b><b>STH-Comet <i>·</i> Histórico</b><b>React <i>·</i> Dashboard</b></div></section>
+
+    <section class="section wrap" id="solucao">
+      <div class="section-heading"><div><div class="eyebrow">01 / A SOLUÇÃO</div><h2>Mais visibilidade.<br><em>Menos suposições.</em></h2></div><p>O VinTrace conecta o ambiente físico a uma interface que transforma leituras em contexto — para acompanhar condições, entender variações e responder a anomalias.</p></div>
+      <div class="feature-grid">
+        <article class="feature-card"><div class="feature-number">01</div><div class="feature-symbol">⌁</div><h3>Monitoramento contínuo</h3><p>Temperatura, umidade e luminosidade em um só lugar, com estrutura preparada para receber dados de sensores.</p><span class="feature-foot">SENSORES · ESP32</span></article>
+        <article class="feature-card"><div class="feature-number">02</div><div class="feature-symbol">◷</div><h3>Histórico com contexto</h3><p>Uma linha do tempo ambiental para investigar oscilações e acompanhar a evolução das condições.</p><span class="feature-foot">DADOS · STH-COMET</span></article>
+        <article class="feature-card"><div class="feature-number">03</div><div class="feature-symbol">↗</div><h3>Alertas configuráveis</h3><p>Limites operacionais e sinalização de anomalias, com caminho de integração para alerta físico e remoto.</p><span class="feature-foot">REGRAS · IOT</span></article>
+      </div>
+    </section>
+
+    <section class="demo-section" id="demo"><div class="wrap demo-layout">
+      <div class="demo-copy"><div class="eyebrow">02 / EXPERIMENTE</div><h2>Uma ideia que você<br><em>pode explorar.</em></h2><p>Altere os valores abaixo e veja como a interface reage às faixas configuradas. Esta experiência é uma simulação local: não envia comandos ao ESP32 e não consulta o FIWARE.</p><div class="demo-note"><span>ⓘ</span><div><b>Modo demonstração</b><br>Valores gerados no navegador. Nenhum hardware conectado.</div></div><a class="text-link" href="#arquitetura">Como funciona a solução <span>→</span></a></div>
+      <div class="demo-panel"><div class="panel-header"><div><span class="tiny-label">VINTRACE / LABORATÓRIO</span><h3>Monitor ambiental</h3></div><span class="demo-chip"><i></i> SIMULADO</span></div>
+        <div id="demo-status" class="demo-status normal"><span id="status-symbol">✓</span><div><b id="status-title">Ambiente dentro da faixa</b><small id="status-copy">Todos os parâmetros estão dentro dos limites de exemplo.</small></div></div>
+        <div class="slider-list">
+          <label class="slider-row"><span><span class="slider-emoji">🌡</span><span><b>Temperatura</b><small>Faixa de exemplo: 10–18 °C</small></span></span><strong><output id="temp-output">14</output> °C</strong><input id="temp-slider" type="range" min="0" max="30" value="14" aria-label="Temperatura simulada" /></label>
+          <label class="slider-row"><span><span class="slider-emoji">◉</span><span><b>Umidade</b><small>Faixa de exemplo: 50–75%</small></span></span><strong><output id="humidity-output">67</output>%</strong><input id="humidity-slider" type="range" min="20" max="100" value="67" aria-label="Umidade simulada" /></label>
+          <label class="slider-row"><span><span class="slider-emoji">☼</span><span><b>Luminosidade</b><small>Faixa de exemplo: 0–35%</small></span></span><strong><output id="light-output">22</output>%</strong><input id="light-slider" type="range" min="0" max="100" value="22" aria-label="Luminosidade simulada" /></label>
+        </div>
+        <div class="panel-footer"><span><i id="led-indicator" class="led-indicator"></i> LED azul (simulado)</span><button id="reset-demo" type="button">Restaurar valores ↺</button></div>
+      </div>
+    </div></section>
+
+    <section class="section wrap architecture" id="arquitetura"><div class="section-heading"><div><div class="eyebrow">03 / ARQUITETURA</div><h2>Do sensor à<br><em>tomada de decisão.</em></h2></div><p>Uma arquitetura em camadas separa hardware, transporte de mensagens, histórico, API e interface. Isso facilita testar cada parte e evoluir a solução com segurança.</p></div>
+      <div class="architecture-flow"><article><span>CAMADA 01</span><b>Dispositivo</b><p>ESP32 · DHT-11 · LDR · LED · buzzer</p></article><div class="flow-arrow">→</div><article><span>CAMADA 02</span><b>Conectividade</b><p>Wi-Fi · MQTT · IoT Agent</p></article><div class="flow-arrow">→</div><article><span>CAMADA 03</span><b>Contexto & histórico</b><p>Orion · STH-Comet</p></article><div class="flow-arrow">→</div><article><span>CAMADAS 04–05</span><b>Aplicação</b><p>FastAPI · React dashboard</p></article></div>
+      <div class="architecture-foot"><span>DESENHO DA SOLUÇÃO</span><p>Arquitetura proposta para o projeto acadêmico. A conexão física e o fluxo FIWARE devem ser validados no ambiente da disciplina.</p></div>
+    </section>
+
+    <section class="wine-memory"><div class="wrap wine-memory-inner"><div class="wine-icon">✳</div><div><div class="eyebrow">DIFERENCIAL EM EVOLUÇÃO</div><h2>Wine Memory<span>.</span></h2><p>Uma memória ambiental para a adega: relacionar períodos de conservação, alertas e histórico por lote ou garrafa. Uma camada de contexto para ir além do valor instantâneo.</p></div><div class="memory-stamp"><span>VINTRACE</span><b>WINE<br>MEMORY</b><small>CONCEITO</small></div></div></section>
+
+    <section class="section wrap" id="equipe"><div class="section-heading"><div><div class="eyebrow">04 / EQUIPE</div><h2>Feito em <em>equipe.</em></h2></div><p>Projeto acadêmico CP5 · 2026</p></div><div class="feature-grid team-grid">
+        <article class="feature-card team-card"><div class="feature-number">01</div><h3>Felipe Ilek</h3><p>Integrante da equipe VinTrace</p></article>
+        <article class="feature-card team-card"><div class="feature-number">02</div><h3>Bruno Gonçalves Minitti</h3><p>Integrante da equipe VinTrace</p></article>
+        <article class="feature-card team-card"><div class="feature-number">03</div><h3>Marcos Vinícius Tudisco</h3><p>Integrante da equipe VinTrace</p></article>
+        <article class="feature-card team-card"><div class="feature-number">04</div><h3>Michel Tatsuya Hanada</h3><p>Integrante da equipe VinTrace</p></article>
+        <article class="feature-card team-card"><div class="feature-number">05</div><h3>Nicolas Gomes de Almeida</h3><p>Integrante da equipe VinTrace</p></article>
+        <article class="feature-card team-card"><div class="feature-number">06</div><h3>Lucas Ferreira Rodrigues Silva</h3><p>Integrante da equipe VinTrace</p></article>
+      </div><p class="team-privacy-note">Os números de matrícula ficam na documentação acadêmica do repositório, não nesta página pública.</p></section>
+
+    <section class="final-cta wrap"><div><div class="eyebrow">UM PROJETO CP5 · 2026</div><h2>Preservar começa com<br><em>entender o ambiente.</em></h2><p>Conheça a implementação, acompanhe a evolução e explore a documentação do VinTrace.</p></div><div class="cta-actions"><a class="button primary" href="#arquitetura">Explorar arquitetura <span>↗</span></a><a class="button secondary" href="#inicio">Voltar ao topo ↑</a></div></section>
+  </main>
+  <footer class="footer"><div class="wrap footer-inner"><a class="brand" href="#inicio"><span class="brand-mark">V</span><span>vintrace<span class="brand-dot">.</span></span></a><span>Projeto acadêmico · CP5 · 2026</span><span>Protótipo em desenvolvimento · dados de demo identificados</span></div></footer>
+  <script src="app.js"></script>
+</body>
+</html>
