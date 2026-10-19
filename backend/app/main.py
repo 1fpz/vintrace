@@ -12,7 +12,6 @@ from .fiware import (
     delete_device_fiware,
     device_id_to_urn,
     fetch_sth_history,
-    generate_demo_history,
     get_current_reading,
     list_devices_fiware,
     register_device_fiware,
@@ -170,26 +169,14 @@ async def remove_device(device_id: str):
 @app.get("/devices/{device_id}/current", response_model=CurrentReading)
 @app.get("/api/devices/{device_id}/current", response_model=CurrentReading)
 async def current_reading(device_id: str):
-    """Retorna a leitura atual do dispositivo obtida do Orion Context Broker."""
     try:
-        reading = await get_current_reading(device_id)
-        return reading
-    except Exception:
-        # Quando Orion não estiver conectado (teste local sem FIWARE ativo),
-        # retorna valores de teste seguros para a tela funcionar em modo offline/demo
-        now_iso = datetime.now(timezone.utc).isoformat()
-        return CurrentReading(
-            device_id=device_id,
-            entity_urn=device_id_to_urn(device_id),
-            timestamp=now_iso,
-            temperature=14.5,
-            humidity=68.0,
-            luminosity=12.0,
-            online=False,
-            status="Normal",
-            alerts={"alertTemp": False, "alertHum": False, "alertLum": False},
-            raw={"note": "Orion Context Broker offline; exibindo leitura para teste local."},
-        )
+        return await get_current_reading(device_id)
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Falha ao consultar Orion: {exc}",
+        ) from exc
 
 
 # ==========================================
@@ -198,25 +185,31 @@ async def current_reading(device_id: str):
 
 @app.get("/devices/{device_id}/history", response_model=HistoryResponse)
 @app.get("/api/devices/{device_id}/history", response_model=HistoryResponse)
-async def device_history(device_id: str, period: str = Query(default="24h", pattern="^(24h|7d|30d)$")):
-    """Consulta séries temporais reais do STH-Comet pela porta 8666."""
+async def device_history(
+    device_id: str,
+    period: str = Query(
+        default="24h",
+        pattern="^(24h|7d|30d)$"
+    )
+):
     try:
-        series = await fetch_sth_history(device_id=device_id, period=period)
+        series = await fetch_sth_history(
+            device_id=device_id,
+            period=period
+        )
+
         return HistoryResponse(
             device_id=device_id,
             period=period,
             history=series,
             source="sth-comet",
         )
-    except Exception:
-        # Quando STH-Comet estiver offline, gera série de demonstração para testes locais sem quebrar o gráfico
-        series = generate_demo_history(period)
-        return HistoryResponse(
-            device_id=device_id,
-            period=period,
-            history=series,
-            source="demo_offline",
-        )
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Falha ao consultar STH-Comet: {exc}",
+        ) from exc
 
 
 # ==========================================
@@ -254,18 +247,35 @@ def update_triggers_endpoint(device_id: str, payload: TriggerConfig):
 # WINE MEMORY (PASSAPORTE AMBIENTAL)
 # ==========================================
 
-@app.get("/devices/{device_id}/wine-memory", response_model=WineMemoryResponse)
-@app.get("/api/devices/{device_id}/wine-memory", response_model=WineMemoryResponse)
+@app.get(
+    "/devices/{device_id}/wine-memory",
+    response_model=WineMemoryResponse
+)
+@app.get(
+    "/api/devices/{device_id}/wine-memory",
+    response_model=WineMemoryResponse
+)
 async def wine_memory_endpoint(device_id: str):
-    """Calcula Passaporte Ambiental real comparando dados do STH-Comet aos triggers."""
+
     triggers = get_device_triggers(device_id)
+
     try:
-        series = await fetch_sth_history(device_id, period="30d")
-        return calculate_wine_memory(device_id, series, triggers)
-    except Exception:
-        # Quando STH-Comet estiver offline, calcula com base na série histórica local
-        demo_series = generate_demo_history("30d")
-        return calculate_wine_memory(device_id, demo_series, triggers)
+        series = await fetch_sth_history(
+            device_id,
+            period="30d"
+        )
+
+        return calculate_wine_memory(
+            device_id,
+            series,
+            triggers
+        )
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Falha ao gerar Wine Memory: {exc}",
+        ) from exc
 
 
 # ==========================================

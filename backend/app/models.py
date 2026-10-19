@@ -51,6 +51,7 @@ class CurrentReading(BaseModel):
 class HistoryPoint(BaseModel):
     time: str
     value: float
+    timestamp: str | None = None
 
 
 class HistorySeries(BaseModel):
@@ -80,7 +81,6 @@ class EnvironmentalIncident(BaseModel):
 
 class WineMemoryResponse(BaseModel):
     device_id: str
-    totalIncidents: number = 0 if False else int
     totalIncidents: int = 0
     exposureTime: str = "0 min"
     lastIncident: str = "Nenhum"
