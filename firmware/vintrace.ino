@@ -970,25 +970,18 @@ void atualizarTela() {
   uint16_t statusColor =
     ST77XX_GREEN;
 
-  // -----------------------------------------------------
-  // DEFINE STATUS
-  // -----------------------------------------------------
+  // =====================================================
+  // DEFINE STATUS PARA ALERTA UNICO
+  // =====================================================
 
-  if (totalAlertas > 1) {
-
-    detalhe =
-      "Multiplos alertas";
-
-    statusColor =
-      ST77XX_RED;
-  }
-
-  else if (alertaTemperatura) {
+  if (alertaTemperatura) {
 
     if (modoTemperatura > 0) {
       detalhe = "Calor excessivo";
       statusColor = ST77XX_RED;
-    } else {
+    }
+
+    else {
       detalhe = "Frio excessivo";
       statusColor = ST77XX_CYAN;
     }
@@ -999,7 +992,9 @@ void atualizarTela() {
     if (modoUmidade > 0) {
       detalhe = "Umidade alta";
       statusColor = ST77XX_BLUE;
-    } else {
+    }
+
+    else {
       detalhe = "Ambiente seco";
       statusColor = COLOR_ORANGE;
     }
@@ -1010,15 +1005,21 @@ void atualizarTela() {
     if (modoLuminosidade > 0) {
       detalhe = "Luz excessiva";
       statusColor = ST77XX_YELLOW;
-    } else {
+    }
+
+    else {
       detalhe = "Pouca luz";
       statusColor = ST77XX_CYAN;
     }
   }
 
-  // -----------------------------------------------------
+  if (totalAlertas > 1) {
+    statusColor = ST77XX_RED;
+  }
+
+  // =====================================================
   // FUNDO
-  // -----------------------------------------------------
+  // =====================================================
 
   tft.fillScreen(
     ST77XX_BLACK
@@ -1026,9 +1027,9 @@ void atualizarTela() {
 
   tft.setTextWrap(false);
 
-  // -----------------------------------------------------
+  // =====================================================
   // CABECALHO
-  // -----------------------------------------------------
+  // =====================================================
 
   tft.fillRoundRect(
     4,
@@ -1054,9 +1055,9 @@ void atualizarTela() {
     "VinTrace"
   );
 
-  // -----------------------------------------------------
+  // =====================================================
   // CARD DOS SENSORES
-  // -----------------------------------------------------
+  // =====================================================
 
   tft.fillRoundRect(
     4,
@@ -1109,9 +1110,9 @@ void atualizarTela() {
     String(luminosidade) + " %"
   );
 
-  // -----------------------------------------------------
+  // =====================================================
   // CARD DO ICONE
-  // -----------------------------------------------------
+  // =====================================================
 
   tft.fillRoundRect(
     102,
@@ -1131,9 +1132,9 @@ void atualizarTela() {
     COLOR_BORDER
   );
 
-  // -----------------------------------------------------
+  // =====================================================
   // ICONE CONFORME STATUS
-  // -----------------------------------------------------
+  // =====================================================
 
   if (totalAlertas > 1) {
 
@@ -1146,27 +1147,51 @@ void atualizarTela() {
   else if (alertaTemperatura) {
 
     if (modoTemperatura > 0) {
-      drawFireIcon(109, 36);
-    } else {
-      drawSnowIcon(109, 36);
+      drawFireIcon(
+        109,
+        36
+      );
+    }
+
+    else {
+      drawSnowIcon(
+        109,
+        36
+      );
     }
   }
 
   else if (alertaUmidade) {
 
     if (modoUmidade > 0) {
-      drawDropIcon(109, 35);
-    } else {
-      drawDryIcon(109, 35);
+      drawDropIcon(
+        109,
+        35
+      );
+    }
+
+    else {
+      drawDryIcon(
+        109,
+        35
+      );
     }
   }
 
   else if (alertaLuminosidade) {
 
     if (modoLuminosidade > 0) {
-      drawSunIcon(109, 35);
-    } else {
-      drawMoonIcon(109, 35);
+      drawSunIcon(
+        109,
+        35
+      );
+    }
+
+    else {
+      drawMoonIcon(
+        109,
+        35
+      );
     }
   }
 
@@ -1178,9 +1203,9 @@ void atualizarTela() {
     );
   }
 
-  // -----------------------------------------------------
+  // =====================================================
   // CARD INFERIOR
-  // -----------------------------------------------------
+  // =====================================================
 
   tft.fillRoundRect(
     4,
@@ -1200,9 +1225,158 @@ void atualizarTela() {
     statusColor
   );
 
-  // -----------------------------------------------------
-  // NORMAL / ALERTA
-  // -----------------------------------------------------
+  // =====================================================
+  // MULTIPLOS ALERTAS
+  // =====================================================
+
+  if (totalAlertas > 1) {
+
+    tft.setTextSize(1);
+
+    tft.setTextColor(
+      ST77XX_RED
+    );
+
+    tft.setCursor(
+      10,
+      91
+    );
+
+    tft.print(
+      "ALERTAS ATIVOS"
+    );
+
+    int linhaY = 99;
+
+    // ---------------------------------------------------
+    // TEMPERATURA
+    // ---------------------------------------------------
+
+    if (alertaTemperatura) {
+
+      if (modoTemperatura > 0) {
+
+        tft.setTextColor(
+          ST77XX_RED
+        );
+
+        tft.setCursor(
+          10,
+          linhaY
+        );
+
+        tft.print(
+          "Temperatura alta"
+        );
+      }
+
+      else {
+
+        tft.setTextColor(
+          ST77XX_CYAN
+        );
+
+        tft.setCursor(
+          10,
+          linhaY
+        );
+
+        tft.print(
+          "Temperatura baixa"
+        );
+      }
+
+      linhaY += 8;
+    }
+
+    // ---------------------------------------------------
+    // UMIDADE
+    // ---------------------------------------------------
+
+    if (alertaUmidade) {
+
+      if (modoUmidade > 0) {
+
+        tft.setTextColor(
+          ST77XX_BLUE
+        );
+
+        tft.setCursor(
+          10,
+          linhaY
+        );
+
+        tft.print(
+          "Umidade alta"
+        );
+      }
+
+      else {
+
+        tft.setTextColor(
+          COLOR_ORANGE
+        );
+
+        tft.setCursor(
+          10,
+          linhaY
+        );
+
+        tft.print(
+          "Umidade baixa"
+        );
+      }
+
+      linhaY += 8;
+    }
+
+    // ---------------------------------------------------
+    // LUMINOSIDADE
+    // ---------------------------------------------------
+
+    if (alertaLuminosidade) {
+
+      if (modoLuminosidade > 0) {
+
+        tft.setTextColor(
+          ST77XX_YELLOW
+        );
+
+        tft.setCursor(
+          10,
+          linhaY
+        );
+
+        tft.print(
+          "Luminosidade alta"
+        );
+      }
+
+      else {
+
+        tft.setTextColor(
+          ST77XX_CYAN
+        );
+
+        tft.setCursor(
+          10,
+          linhaY
+        );
+
+        tft.print(
+          "Luminosidade baixa"
+        );
+      }
+
+      linhaY += 8;
+    }
+
+    return;
+  }
+
+  // =====================================================
+  // ALERTA UNICO OU NORMAL
+  // =====================================================
 
   tft.setTextSize(2);
 
@@ -1229,9 +1403,9 @@ void atualizarTela() {
     );
   }
 
-  // -----------------------------------------------------
-  // DESCRICAO DO STATUS
-  // -----------------------------------------------------
+  // =====================================================
+  // DESCRICAO
+  // =====================================================
 
   tft.setTextSize(1);
 
