@@ -8,11 +8,11 @@ import {
 } from 'lucide-react'
 
 import DeviceCard from '../components/DeviceCard'
-import type { Device } from '../data/mockDevices'
+
 import { api, type DeviceItem } from '../services/api'
 
 function DevicesPage() {
-  const [devices, setDevices] = useState<Device[]>([])
+  const [devices, setDevices] = useState<DeviceItem[]>([])
   const [loading, setLoading] = useState(true)
   const [apiError, setApiError] = useState('')
 
