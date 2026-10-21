@@ -1,26 +1,30 @@
-# Roteiro de pitch — 3 a 4 minutos
+# Roteiro de pitch — VinTrace
 
 **Equipe:** Felipe Ilek, Bruno Gonçalves Minitti, Marcos Vinícius Tudisco, Michel Tatsuya Hanada, Nicolas Gomes de Almeida e Lucas Ferreira Rodrigues Silva.
 
+## 1. Problema
 
-## 1. Problema (20–30 s)
-A conservação de vinhos depende de condições ambientais consistentes. Mudanças de temperatura, umidade e exposição à luz podem passar despercebidas sem monitoramento contínuo.
+A conservação de vinhos depende de condições ambientais estáveis. Variações de temperatura, umidade e luminosidade podem passar despercebidas sem monitoramento contínuo.
 
-## 2. Solução (30 s)
-O VinTrace propõe monitorar esses parâmetros com ESP32 e sensores, manter histórico em FIWARE/STH-Comet e apresentar o estado da adega em um dashboard.
+## 2. Solução
 
-## 3. Demonstração técnica (90–120 s)
-1. Mostrar a montagem física e identificar DHT-11, LDR, LED e buzzer.
-2. Mostrar leitura do sensor e publicação MQTT/FIWARE.
-3. Abrir o dashboard e apontar valores/histórico com origem real identificada.
-4. Alterar uma condição ou trigger e provocar a anomalia de forma controlada.
-5. Demonstrar LED piscando e padrão sonoro correspondente.
-6. Restaurar condições e provar que o alerta só para quando todos os parâmetros estão normais.
+O VinTrace conecta sensores físicos a uma arquitetura FIWARE e a um dashboard web. O sistema acompanha o ambiente, guarda histórico, permite configurar limites e aciona alertas físicos remotamente.
 
-## 4. Diferencial (30 s)
-Apresentar o conceito Wine Memory: associar condições ambientais e eventos ao histórico de conservação de um lote/garrafa, com potencial para construir uma memória verificável da adega.
+## 3. Demonstração técnica
 
-## 5. Encerramento (15 s)
-Mostrar repositório, documentação, arquitetura em camadas e limitações/etapas futuras.
+1. Mostrar a carcaça e identificar ESP32, DHT11, LDR, TFT, LED e buzzer.
+2. Abrir o dashboard e confirmar `vintrace001` online.
+3. Mostrar temperatura, umidade e luminosidade atuais.
+4. Mostrar os gráficos vindos do STH-Comet.
+5. Alterar um trigger no dashboard para provocar uma anomalia controlada.
+6. Mostrar o comando chegando ao ESP32: TFT, LED piscando e som correspondente.
+7. Restaurar o trigger e mostrar a normalização.
+8. Abrir o Wine Memory e explicar o Passaporte Ambiental.
 
-**Regra de apresentação:** substituir esta narrativa por fatos observados na demonstração. Não mostrar a demo sintética como telemetria física.
+## 4. Diferencial
+
+O Wine Memory transforma o histórico ambiental em incidentes de exposição, mostrando sensor, direção, duração e pico. O TFT também diferencia alertas acima e abaixo da faixa e apresenta múltiplas anomalias simultâneas.
+
+## 5. Encerramento
+
+Mostrar o repositório, a arquitetura em camadas, o Wokwi público e os manuais. Finalizar reforçando que o fluxo demonstrado percorre o dashboard, backend, FIWARE e hardware físico.

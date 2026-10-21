@@ -1,61 +1,197 @@
 # Manual de instalação e operação — software
 
-## Pré-requisitos
+## 1. Pré-requisitos
 
-- Node.js LTS + npm
+- Git
 - Python 3.11+
-- Acesso ao ambiente FIWARE/MQTT da disciplina para telemetria real
+- Node.js 18+ e npm
+- Arduino IDE para upload do firmware
+- acesso ao stack FIWARE: Orion, IoT Agent, Mosquitto e STH-Comet
 
-## Dashboard local
+## 2. Backend local
 
-```powershell
-cd dashboard/frontend
-npm install
-npm run dev
-```
-Abra a URL local indicada pelo Vite, normalmente `http://localhost:5173`.
+Na raiz do projeto:
 
-Para compilar e revisar:
-
-```powershell
-npm run build
-npm run lint
-```
-
-**Atenção:** a versão recebida do dashboard ainda usa dados `mock*`. O layout abre como protótipo, mas precisa ser conectado à API para mostrar dados reais.
-
-## API local
-
-Em um terminal separado:
-
-```powershell
+```bash
 cd backend
 python -m venv .venv
-.venv\Scripts\Activate.ps1
+source .venv/Scripts/activate
 pip install -r requirements.txt
-Copy-Item .env.example .env
+cp .env.example .env
+```
+
+Configure `backend/.env` com os endpoints do ambiente FIWARE.
+
+Para desenvolvimento local, pode manter:
+
+```env
+TRIGGER_STORAGE=local
+```
+
+Para uma execução integrada em que os triggers devem ficar no Orion:
+
+```env
+TRIGGER_STORAGE=fiware
+```
+
+Execute:
+
+```bash
 uvicorn app.main:app --reload --port 8000
 ```
 
-Teste `http://127.0.0.1:8000/health` e `http://127.0.0.1:8000/docs`.
+Verificações:
 
-Configure no arquivo local `.env` os endereços e nomes de entidade/atributos do FIWARE disponibilizado pela disciplina. O nome exato da entidade, tipo e atributos depende do provisionamento feito no IoT Agent; confirme com o ambiente da equipe.
+```text
+http://127.0.0.1:8000/health
+http://127.0.0.1:8000/health/fiware
+http://127.0.0.1:8000/docs
+```
 
-## API e endpoints
+## 3. Frontend local
 
-| Método | Endpoint | Uso |
+```bash
+cd dashboard/frontend
+npm install
+```
+
+Crie `.env`:
+
+```env
+VITE_API_URL=http://localhost:8000
+```
+
+Execute:
+
+```bash
+npm run dev
+```
+
+Validação antes da entrega:
+
+```bash
+npm run lint
+npm run build
+```
+
+## 4. Endpoints principais
+
+| Método | Endpoint | Função |
 |---|---|---|
-| GET | `/health` | Verificar se a API está ativa |
-| GET | `/api/devices` | Listar dispositivos registrados em memória |
-| POST | `/api/devices` | Registrar dispositivo em memória |
-| GET | `/api/triggers/{device_id}` | Ler limites configurados |
-| PUT | `/api/triggers/{device_id}` | Validar e atualizar limites em memória |
-| GET | `/api/telemetry/{attribute}?source=demo` | Dados sintéticos para teste local |
-| GET | `/api/telemetry/{attribute}?source=fiware` | Consultar o STH-Comet e falhar se indisponível |
-| POST | `/api/commands` | Publicar comando MQTT para dispositivo |
+| GET | `/health` | saúde da API |
+| GET | `/health/fiware` | Orion, IoT Agent e STH-Comet |
+| GET | `/devices` | lista dispositivos reais |
+| POST | `/devices` | provisiona IoT Device |
+| DELETE | `/devices/{id}` | remove dispositivo do FIWARE |
+| GET | `/devices/{id}/current` | leitura atual do Orion |
+| GET | `/devices/{id}/history?period=24h` | histórico do STH-Comet |
+| GET | `/devices/{id}/triggers` | consulta limites |
+| PUT | `/devices/{id}/triggers` | salva limites |
+| GET | `/devices/{id}/alerts` | alertas detectados pelo monitor |
+| GET | `/devices/{id}/wine-memory` | Passaporte Ambiental |
+| POST | `/devices/{id}/monitoring/start` | inicia monitoramento |
+| POST | `/devices/{id}/monitoring/stop` | interrompe monitoramento |
+| POST | `/commands` | comando FIWARE manual |
 
-Os cadastros e triggers atuais são temporários: reiniciar a API apaga alterações. Não use essa limitação como se fosse persistência implementada.
+## 5. Publicação utilizada no projeto
 
-## Publicação
+Dashboard:
 
-O site estático em `site/` pode ser publicado em GitHub Pages. A API conectada ao FIWARE precisa ser hospedada separadamente em ambiente acessível e configurada com as credenciais do laboratório. Nunca exponha credenciais FIWARE/MQTT em JavaScript público.
+```text
+https://vintrace-wheat.vercel.app
+```
+
+Backend:
+
+```text
+https://vintrace-backend.onrender.com
+```
+
+Na publicação do frontend:
+
+```env
+VITE_API_URL=https://vintrace-backend.onrender.com
+```
+
+No Render, use `TRIGGER_STORAGE=fiware` para persistir limites no Orion.
+
+## 6. Operação do ambiente FIWARE
+
+Antes da demonstração:
+
+1. iniciar o Lab da AWS/Vocareum;
+2. aguardar a instância ficar ativa;
+3. verificar `/health/fiware`;
+4. alimentar o ESP32;
+5. confirmar que o dispositivo aparece online no dashboard.
+
+O backend do plano gratuito do Render pode entrar em modo de espera. Abra o dashboard/backend alguns minutos antes da apresentação para garantir que o serviço esteja acordado.
+
+## 7. Testes automatizados
+
+Backend:
+
+```bash
+cd backend
+source .venv/Scripts/activate
+unset TRIGGER_STORAGE
+pytest -q
+python -m compileall -q app
+```
+
+O `pytest` deve usar o modo local para não depender do FIWARE real durante os testes unitários.
+
+Resultado da revisão final:
+
+```text
+8 passed
+```
+
+## 8. Observação sobre Git Bash e FIWARE_SERVICE_PATH
+
+No Git Bash do Windows, exportar manualmente:
+
+```bash
+export FIWARE_SERVICE_PATH=/
+```
+
+pode fazer o Git Bash converter `/` para um caminho do Windows. Isso causa `400 Bad Request` no Orion.
+
+Prefira deixar `/` no `.env` ou no valor padrão da aplicação. Se estiver testando por variáveis temporárias no Git Bash, não exporte `FIWARE_SERVICE_PATH` desnecessariamente.
+
+## 9. Troubleshooting
+
+### Dispositivo aparece offline
+
+- confirme que o ESP32 está alimentado;
+- pressione `EN/RESET` se acabou de reconectar o USB;
+- abra Serial Monitor em 115200 baud;
+- confirme Wi-Fi e MQTT;
+- teste a porta MQTT 1883;
+- confira `/health/fiware`.
+
+### Orion responde 400
+
+Confirme os headers:
+
+```text
+fiware-service: smart
+fiware-servicepath: /
+```
+
+### Triggers retornam `persisted:false`
+
+Em produção, confirme:
+
+```env
+TRIGGER_STORAGE=fiware
+```
+
+E verifique se os atributos `trigger*` existem na entidade do Orion.
+
+### Histórico vazio
+
+- confirme a Subscription do Orion para o STH-Comet;
+- confirme telemetria atual no Orion;
+- verifique a porta 8666;
+- confirme `fiware-service` e `fiware-servicepath`.

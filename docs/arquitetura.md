@@ -2,39 +2,122 @@
 
 ## Objetivo
 
-Monitorar condições ambientais de uma adega, armazenar histórico de leituras, comparar os valores com limites configurados e comunicar anomalias ao operador.
+Monitorar temperatura, umidade e luminosidade em uma adega, guardar histórico, comparar os valores com limites configuráveis e acionar alertas físicos remotamente quando houver anomalias.
 
 ## Camadas
 
-1. **Dispositivo físico:** ESP32, DHT-11 (temperatura/umidade), LDR (luminosidade), LED azul e buzzer.
-2. **Conectividade:** Wi-Fi e MQTT. O formato de tópicos e payloads deve coincidir com o provisionamento do IoT Agent adotado no laboratório.
-3. **Contexto e histórico FIWARE:** Orion Context Broker mantém o estado atual; STH-Comet armazena séries históricas e deve estar acessível na porta 8666 conforme o enunciado.
-4. **API de aplicação:** FastAPI centraliza leitura do histórico, validação de limites e envio de comandos. A versão atual ainda guarda cadastro e triggers em memória; não é persistência de produção.
-5. **Interface:** dashboard React/TypeScript para dispositivos, monitoramento, triggers e Wine Memory; landing page estática para apresentação pública.
+1. **Dispositivo físico** — ESP32, DHT11, LDR, TFT ST7735, LED azul e buzzer passivo.
+2. **Transporte** — Wi-Fi, MQTT e protocolo UltraLight 2.0.
+3. **Adaptação IoT** — IoT Agent UltraLight recebe telemetria e converte entre MQTT/UltraLight e NGSIv2.
+4. **Contexto** — Orion Context Broker mantém o estado atual das entidades e encaminha comandos.
+5. **Histórico** — STH-Comet armazena e disponibiliza séries temporais.
+6. **Aplicação** — FastAPI centraliza dispositivos, leituras, histórico, triggers, monitoramento e Wine Memory.
+7. **Interface** — React/TypeScript apresenta as informações e permite operar o sistema.
 
 ## Fluxo de telemetria
 
-1. ESP32 coleta sensores e prepara a mensagem.
-2. A mensagem segue pelo broker/MQTT e pelo mapeamento configurado no IoT Agent.
-3. O Orion recebe/atualiza o contexto e o STH-Comet mantém o histórico.
-4. A API consulta o histórico no endpoint STH-Comet e disponibiliza os dados ao frontend.
-5. O frontend diferencia telemetria real de dados de demonstração.
+```text
+DHT11 + LDR
+    ↓
+ESP32
+    ↓ MQTT /ul/TEF/{device_id}/attrs
+Mosquitto
+    ↓
+IoT Agent UltraLight
+    ↓
+Orion
+    ↓ Subscription
+STH-Comet
+    ↓
+FastAPI
+    ↓
+React
+```
 
-## Fluxo de alerta
+O Orion representa o estado atual. O STH-Comet é a fonte das séries históricas.
 
-- O operador define limites no frontend.
-- A API valida `min < max` para cada sensor.
-- A configuração deve ser enviada ao dispositivo ou aplicada em lógica de controle confiável. A API incluída valida e mantém os limites em memória, mas o fluxo completo de distribuição das faixas para o ESP32 ainda precisa ser integrado.
-- Se qualquer sensor permanecer fora da faixa, o LED azul deve continuar piscando. Ao normalizar um sensor, o alerta só deve cessar quando todos os sensores estiverem normais.
-- Sons distintos devem identificar temperatura, umidade e luminosidade.
+## Fluxo de alerta remoto
 
-## Diferencial — Wine Memory
+```text
+Usuário altera triggers no dashboard
+    ↓
+FastAPI persiste os limites no Orion
+    ↓
+Monitor do backend consulta a leitura atual
+    ↓
+Detecta abaixo / normal / acima
+    ↓
+FastAPI envia comando NGSIv2 ao Orion
+    ↓
+IoT Agent converte para MQTT
+    ↓
+ESP32 recebe high / low / off
+    ↓
+TFT + LED + buzzer
+```
 
-A página Wine Memory pode evoluir para um registro de condições de armazenamento e eventos por garrafa/lote, relacionando períodos de temperatura, umidade e luz com o histórico de conservação. Para afirmar que esse histórico é real, a implementação precisa relacionar leituras a lotes/garrafas e persistir esses vínculos.
+Comandos:
 
-## Segurança e limites atuais
+```text
+alertTemp = high | low | off
+alertHum  = high | low | off
+alertLum  = high | low | off
+```
 
-- Não guardar segredos no frontend nem no repositório.
-- Habilitar CORS somente para origens conhecidas ao publicar a API.
-- A API atual tem CORS local, cadastro/triggers em memória e adaptador STH-Comet básico.
-- Antes de produção, adicionar autenticação, banco persistente, controle de acesso, auditoria e testes de integração.
+O firmware mantém os alertas independentes. A normalização de uma variável não desliga outra anomalia ainda ativa.
+
+## Persistência dos triggers
+
+Há dois modos:
+
+- `TRIGGER_STORAGE=local`: arquivo `backend/data/triggers.json`, usado em desenvolvimento/testes;
+- `TRIGGER_STORAGE=fiware`: atributos da entidade no Orion, usado na publicação do backend.
+
+No ambiente final, a persistência FIWARE evita depender do filesystem temporário do Render.
+
+## Histórico
+
+A API oferece:
+
+```text
+24h
+7d
+30d
+```
+
+O backend tenta usar agregações do STH-Comet por minuto/hora. Quando necessário, faz paginação do histórico bruto com `hLimit` e `hOffset` e reduz os pontos para uso no gráfico.
+
+## Wine Memory
+
+O Wine Memory interpreta os pontos históricos do STH-Comet e gera incidentes por sensor.
+
+Cada incidente pode registrar:
+
+- `type`: temperatura, umidade ou luminosidade;
+- `direction`: `high` ou `low`;
+- início e fim;
+- duração;
+- pico;
+- descrição;
+- estado ativo ou encerrado.
+
+A versão atual calcula a exposição retrospectivamente com base nos triggers vigentes na consulta. Alterações históricas de trigger não são versionadas.
+
+## Infraestrutura
+
+| Serviço | Porta |
+|---|---:|
+| Orion Context Broker | 1026 |
+| IoT Agent UltraLight | 4041 |
+| Mosquitto MQTT | 1883 |
+| STH-Comet | 8666 |
+| MongoDB | 27017 interno |
+
+## Segurança
+
+- Credenciais de Wi-Fi ficam em `firmware/secrets.h`, ignorado pelo Git.
+- Variáveis de ambiente reais ficam em `backend/.env` ou no provedor de deploy.
+- O navegador não acessa diretamente credenciais FIWARE.
+- O MongoDB não deve ser exposto desnecessariamente à internet.
+
+O projeto é uma prova de conceito acadêmica. Uma implantação de produção exigiria autenticação, autorização, auditoria e políticas de rede mais restritas.

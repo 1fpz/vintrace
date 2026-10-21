@@ -1,28 +1,108 @@
 # VinTrace Edge — ESP32
 
-## Componentes
+Firmware físico do VinTrace para ESP32, DHT11, LDR, TFT ST7735, LED azul e buzzer passivo.
 
-- ESP32 DevKit (LED azul onboard normalmente no GPIO 2; confirme sua placa)
-- DHT-11: DATA no GPIO 4, VCC conforme o módulo, GND em comum
-- LDR em divisor de tensão com resistor (saída analógica no GPIO 34)
-- Buzzer no GPIO 25 (se o buzzer exigir corrente maior, use transistor/driver)
-- Jumpers e protoboard
+## Pinagem
 
-## Bibliotecas Arduino IDE
+| Componente | GPIO |
+|---|---:|
+| DHT11 DATA | 4 |
+| LDR | 34 |
+| TFT SCK | 18 |
+| TFT MOSI | 23 |
+| TFT CS | 21 |
+| TFT DC | 16 |
+| TFT RST | 17 |
+| LED azul | 27 |
+| Buzzer passivo | 25 |
 
-Instale `DHT sensor library` (Adafruit), `Adafruit Unified Sensor`, `PubSubClient` e `ArduinoJson` pelo Library Manager. Selecione uma placa ESP32 compatível.
+## Bibliotecas
 
-1. Copie `secrets.example.h` para `secrets.h`.
-2. Configure Wi-Fi e broker MQTT em `secrets.h`.
-3. Abra `vintrace.ino`, compile e envie para a placa.
-4. Abra Serial Monitor em 115200 baud.
-5. Publique `ALERT_ON`, `ALERT_OFF` ou `BUZZER_TEST` no tópico `vintrace/vintrace001/command` para testar comandos.
-6. Observe a telemetria no tópico `vintrace/vintrace001/telemetry`.
+Instale pelo Arduino IDE:
 
-## Limitações que precisam ser validadas
+- DHT sensor library (Adafruit)
+- Adafruit Unified Sensor
+- PubSubClient
+- Adafruit GFX Library
+- Adafruit ST7735 and ST7789 Library
 
-- Este é um firmware-base, não uma integração FIWARE pronta. O IoT Agent precisa ser provisionado para os tópicos/payloads usados, ou a equipe deve adaptar o firmware ao protocolo já adotado no laboratório.
-- O mapeamento de luminosidade depende da orientação do LDR e do divisor; calibre com leituras reais.
-- O LED usa GPIO 2 como padrão, mas algumas placas possuem LED onboard em outro pino.
-- DHT-11 e LDR reais podem exigir ajuste de limites. A simulação solicitada no enunciado usa DHT-22.
-- O estado remoto e as regras locais são combinados: o alerta local permanece se houver qualquer sensor fora da faixa.
+## Segredos
+
+Copie:
+
+```text
+secrets.example.h
+```
+
+para:
+
+```text
+secrets.h
+```
+
+Preencha Wi-Fi e broker MQTT. `secrets.h` está ignorado pelo Git e não deve ser versionado.
+
+## Arduino IDE
+
+O Arduino IDE pode exigir que o arquivo `vintrace.ino` esteja dentro de uma pasta chamada `vintrace`.
+
+Se necessário, crie temporariamente:
+
+```text
+firmware/vintrace/
+```
+
+com:
+
+```text
+vintrace.ino
+secrets.h
+```
+
+Depois do upload, mantenha no repositório apenas o arquivo oficial `firmware/vintrace.ino` e nunca faça commit do `secrets.h`.
+
+## MQTT / FIWARE
+
+```text
+Device ID: vintrace001
+Telemetria: /ul/TEF/vintrace001/attrs
+Comandos: /TEF/vintrace001/cmd
+Resultado: /ul/TEF/vintrace001/cmdexe
+```
+
+Comandos aceitos:
+
+```text
+alertTemp|high
+alertTemp|low
+alertTemp|off
+
+alertHum|high
+alertHum|low
+alertHum|off
+
+alertLum|high
+alertLum|low
+alertLum|off
+```
+
+O parser também mantém compatibilidade com `on` como alerta alto.
+
+## Alertas
+
+- Temperatura: 700 Hz
+- Umidade: 1100 Hz
+- Luminosidade: 1600 Hz
+- LED azul pisca enquanto houver qualquer alerta.
+- Múltiplos alertas alternam os sons.
+- A TFT diferencia condições acima e abaixo do limite.
+
+## Serial Monitor
+
+Baud rate:
+
+```text
+115200
+```
+
+Após energizar/resetar, confirme Wi-Fi e MQTT antes de diagnosticar falhas no FIWARE.

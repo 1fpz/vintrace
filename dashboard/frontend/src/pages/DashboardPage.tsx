@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   Activity,
   AlertCircle,
@@ -19,11 +19,11 @@ import {
   type DeviceItem,
   type TriggerConfig,
 } from '../services/api'
-import { mockAlerts } from '../data/mockAlerts'
 
 function DashboardPage() {
   const [devices, setDevices] = useState<DeviceItem[]>([])
   const [deviceId, setDeviceId] = useState<string>('vintrace001')
+
   const [deviceInfo, setDeviceInfo] = useState({
     name: 'Adega principal',
     location: 'Laboratório',
@@ -31,9 +31,9 @@ function DashboardPage() {
   })
 
   const [current, setCurrent] = useState({
-    temperature: 14.2,
-    humidity: 68.0,
-    luminosity: 12.0,
+    temperature: 0,
+    humidity: 0,
+    luminosity: 0,
   })
 
   const [triggers, setTriggers] = useState<TriggerConfig>({
@@ -43,95 +43,156 @@ function DashboardPage() {
   })
 
   const [alerts, setAlerts] = useState<AlertItem[]>([])
-  const [online, setOnline] = useState(true)
+  const [online, setOnline] = useState(false)
   const [apiError, setApiError] = useState('')
 
-  // 1. Carregar lista de dispositivos
+  // =====================================================
+  // CARREGAR DISPOSITIVOS
+  // =====================================================
+
   useEffect(() => {
-    async function loadDevices() {
-      try {
-        const res = await api.getDevices()
-        if (res.items && res.items.length > 0) {
-          setDevices(res.items)
-          const first = res.items[0]
-          setDeviceId(first.id)
-          setDeviceInfo({
-            name: first.name,
-            location: first.location,
-            lastUpdate: 'Conectado',
-          })
+    const timeout = setTimeout(() => {
+      void (async () => {
+        try {
+          const res = await api.getDevices()
+
+          if (res.items && res.items.length > 0) {
+            setDevices(res.items)
+
+            const first = res.items[0]
+
+            setDeviceId(first.id)
+
+            setDeviceInfo({
+              name: first.name,
+              location: first.location,
+              lastUpdate: 'Atualizando...',
+            })
+          } else {
+            setDevices([])
+          }
+
+          setApiError('')
+        } catch (err: unknown) {
+          const msg =
+            err instanceof Error
+              ? err.message
+              : 'Falha ao carregar dispositivos'
+
+          setDevices([])
+          setApiError(msg)
+          setOnline(false)
         }
-      } catch {
-        // Fallback
-      }
-    }
-    loadDevices()
+      })()
+    }, 0)
+
+    return () => clearTimeout(timeout)
   }, [])
 
-  // 2. Iniciar monitoramento ao selecionar dispositivo e carregar triggers
-  useEffect(() => {
-    if (!deviceId) return
-    api.startMonitoring(deviceId).catch(() => {})
+  // =====================================================
+  // MONITORAMENTO + TRIGGERS
+  // =====================================================
 
-    async function loadTriggers() {
-      try {
-        const res = await api.getTriggers(deviceId)
-        if (res.triggers) {
-          setTriggers(res.triggers)
-        }
-      } catch {
-        // Default mantido
-      }
+  useEffect(() => {
+    if (!deviceId) {
+      return
     }
-    loadTriggers()
+
+    const timeout = setTimeout(() => {
+      void api.startMonitoring(deviceId).catch(() => {})
+
+      void (async () => {
+        try {
+          const res = await api.getTriggers(deviceId)
+
+          if (res.triggers) {
+            setTriggers(res.triggers)
+          }
+        } catch (err: unknown) {
+          const msg =
+            err instanceof Error
+              ? err.message
+              : 'Falha ao carregar triggers'
+
+          setApiError(msg)
+        }
+      })()
+    }, 0)
+
+    return () => clearTimeout(timeout)
   }, [deviceId])
 
-  // 3. Atualizar leitura atual e alertas
+  // =====================================================
+  // ATUALIZAR LEITURA E ALERTAS
+  // =====================================================
+
   const refreshData = useCallback(async () => {
-    if (!deviceId) return
+    if (!deviceId) {
+      return
+    }
+
     try {
-      const reading: CurrentReading = await api.getCurrentReading(deviceId)
+      const reading: CurrentReading =
+        await api.getCurrentReading(deviceId)
+
       setCurrent({
         temperature: reading.temperature,
         humidity: reading.humidity,
         luminosity: reading.luminosity,
       })
+
       setOnline(reading.online)
+
       setDeviceInfo((prev) => ({
         ...prev,
-        lastUpdate: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        lastUpdate: new Date(
+          reading.timestamp,
+        ).toLocaleTimeString('pt-BR', {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        }),
       }))
+
       setApiError('')
-    } catch {
-      // Fallback
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error
+          ? err.message
+          : 'Falha ao obter leitura atual'
+
+      setApiError(msg)
+      setOnline(false)
     }
 
     try {
-      const alertsRes = await api.getAlerts(deviceId)
-      if (alertsRes && alertsRes.alerts && alertsRes.alerts.length > 0) {
-        setAlerts(alertsRes.alerts)
-      } else {
-        setAlerts(
-          mockAlerts.map((a) => ({
-            id: a.id,
-            sensor: a.sensor,
-            message: a.message,
-            value: a.value,
-            time: a.time,
-            active: false,
-          })),
-        )
-      }
+      const alertsRes =
+        await api.getAlerts(deviceId)
+
+      setAlerts(alertsRes.alerts ?? [])
     } catch {
-      // Fallback para mock
+      setAlerts([])
     }
   }, [deviceId])
 
   useEffect(() => {
-    refreshData()
-    const interval = setInterval(refreshData, 5000)
-    return () => clearInterval(interval)
+    const timeout = setTimeout(() => {
+      void refreshData()
+    }, 0)
+
+    const interval = setInterval(() => {
+      void refreshData()
+    }, 5000)
+
+    return () => {
+      clearTimeout(timeout)
+      clearInterval(interval)
+    }
   }, [refreshData])
+
+  // =====================================================
+  // STATUS DOS SENSORES
+  // =====================================================
 
   const temperatureNormal =
     current.temperature >= triggers.temperature.min &&
@@ -149,6 +210,10 @@ function DashboardPage() {
     temperatureNormal &&
     humidityNormal &&
     luminosityNormal
+
+  // =====================================================
+  // INTERFACE
+  // =====================================================
 
   return (
     <div>
@@ -173,7 +238,13 @@ function DashboardPage() {
               value={deviceId}
               onChange={(e) => {
                 setDeviceId(e.target.value)
-                const found = devices.find((d) => d.id === e.target.value)
+
+                const found =
+                  devices.find(
+                    (device) =>
+                      device.id === e.target.value,
+                  )
+
                 if (found) {
                   setDeviceInfo({
                     name: found.name,
@@ -184,25 +255,49 @@ function DashboardPage() {
               }}
               className="rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-1.5 text-xs text-zinc-300 outline-none focus:border-amber-400"
             >
-              {devices.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.name} ({d.id})
+              {devices.map((device) => (
+                <option
+                  key={device.id}
+                  value={device.id}
+                >
+                  {device.name} ({device.id})
                 </option>
               ))}
             </select>
           )}
 
-          <div className="flex items-center gap-2 self-start rounded-full border border-emerald-900 bg-emerald-950 px-3 py-1.5 text-sm text-emerald-400">
-            <span className={`h-2 w-2 rounded-full ${online ? 'bg-emerald-400 animate-pulse' : 'bg-zinc-500'}`} />
-            {online ? 'Dispositivo online' : 'Dispositivo offline'}
+          <div
+            className={`flex items-center gap-2 self-start rounded-full border px-3 py-1.5 text-sm ${
+              online
+                ? 'border-emerald-900 bg-emerald-950 text-emerald-400'
+                : 'border-zinc-800 bg-zinc-900 text-zinc-400'
+            }`}
+          >
+            <span
+              className={`h-2 w-2 rounded-full ${
+                online
+                  ? 'animate-pulse bg-emerald-400'
+                  : 'bg-zinc-500'
+              }`}
+            />
+
+            {online
+              ? 'Dispositivo online'
+              : 'Dispositivo offline'}
           </div>
         </div>
       </div>
 
       {apiError && (
         <div className="mt-4 flex items-center gap-3 rounded-xl border border-amber-900/50 bg-amber-950/20 p-4 text-xs text-amber-300">
-          <AlertCircle size={16} className="shrink-0" />
-          <span>Aviso da API: {apiError}</span>
+          <AlertCircle
+            size={16}
+            className="shrink-0"
+          />
+
+          <span>
+            Aviso da API: {apiError}
+          </span>
         </div>
       )}
 
@@ -322,32 +417,38 @@ function DashboardPage() {
         </div>
 
         <div className="divide-y divide-zinc-800">
-          {alerts.map((alert) => (
-            <div
-              key={alert.id}
-              className="flex flex-col gap-2 p-5 sm:flex-row sm:items-center sm:justify-between"
-            >
-              <div>
-                <p className="font-medium text-zinc-200">
-                  {alert.sensor}
-                </p>
-
-                <p className="mt-1 text-sm text-zinc-500">
-                  {alert.message}
-                </p>
-              </div>
-
-              <div className="sm:text-right">
-                <p className="text-sm font-medium text-red-400">
-                  {alert.value}
-                </p>
-
-                <p className="mt-1 text-xs text-zinc-500">
-                  {alert.time}
-                </p>
-              </div>
+          {alerts.length === 0 ? (
+            <div className="p-5 text-sm text-zinc-500">
+              Nenhum alerta registrado.
             </div>
-          ))}
+          ) : (
+            alerts.map((alert) => (
+              <div
+                key={alert.id}
+                className="flex flex-col gap-2 p-5 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div>
+                  <p className="font-medium text-zinc-200">
+                    {alert.sensor}
+                  </p>
+
+                  <p className="mt-1 text-sm text-zinc-500">
+                    {alert.message}
+                  </p>
+                </div>
+
+                <div className="sm:text-right">
+                  <p className="text-sm font-medium text-red-400">
+                    {alert.value}
+                  </p>
+
+                  <p className="mt-1 text-xs text-zinc-500">
+                    {alert.time}
+                  </p>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

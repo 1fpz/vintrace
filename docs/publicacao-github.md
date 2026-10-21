@@ -1,61 +1,77 @@
-# Publicar o VinTrace no GitHub e colocar o site no ar
+# Publicação e deploy — VinTrace
 
-## 1. Criar o repositório
+## Repositório
 
-1. Entre em https://github.com/new.
-2. Nome sugerido: `vintrace`.
-3. Descrição: `Monitoramento inteligente de adegas com ESP32, sensores, FIWARE e dashboard web — projeto acadêmico CP5.`
-4. Escolha **Public** se a equipe e as regras da disciplina permitirem.
-5. Não marque para adicionar README, `.gitignore` ou licença: estes arquivos já estão no projeto.
-6. Clique em Create repository.
+https://github.com/br330a/vintrace
 
-## 2. Enviar os arquivos pelo PowerShell
+## Serviços publicados
 
-Extraia o ZIP do projeto para uma pasta. Abra PowerShell nessa pasta, onde aparece o `README.md` principal, e execute:
+Dashboard:
 
-```powershell
-git init
-git add .
-git status
-git commit -m "feat: organize VinTrace CP5 project"
-git branch -M main
-git remote add origin https://github.com/SEU-USUARIO/vintrace.git
-git push -u origin main
+```text
+https://vintrace-wheat.vercel.app
 ```
 
-Troque `SEU-USUARIO` pelo seu nome de usuário do GitHub. Se o Git pedir autenticação, siga a janela oficial do Git Credential Manager; não cole token em arquivo nem no chat.
+Backend:
 
-Antes do `git add`, confirme que `firmware/secrets.h`, `backend/.env` e qualquer credencial não aparecem no `git status`. Eles devem estar ignorados.
+```text
+https://vintrace-backend.onrender.com
+```
 
-## 3. Publicar o site gratuitamente
+Wokwi:
 
-O workflow `.github/workflows/deploy-site.yml` publica automaticamente a pasta `site/`.
+```text
+https://wokwi.com/projects/478447086402895873
+```
 
-1. No repositório GitHub, abra **Settings → Pages**.
-2. Em Build and deployment / Source, escolha **GitHub Actions**.
-3. Abra a aba **Actions** e aguarde o workflow `Deploy VinTrace site to GitHub Pages` terminar com sucesso.
-4. A URL pública aparece na execução do workflow e em Settings → Pages.
-5. Abra a URL em janela anônima e no celular; confirme que a página e a demo carregam.
+## Fluxo de atualização
 
-## 4. Atualizar depois
+O trabalho final é preparado em branch e só depois integrado à `main`.
 
-Sempre que alterar arquivos:
+Antes de enviar alterações:
 
-```powershell
+```bash
+git status
+git diff --check
+```
+
+Depois:
+
+```bash
 git add .
-git commit -m "docs: update VinTrace project"
+git commit -m "tipo: descricao da alteracao"
 git push
 ```
 
-A alteração em `site/` dispara nova publicação. Mudanças no dashboard ou API atualizam o repositório, mas não criam hospedagem pública automática para esses serviços.
+## Segurança antes do push
 
-## 5. Equipe acadêmica
+Nunca versionar:
 
-Os integrantes foram registrados em [`equipe.md`](equipe.md). Confirme com todos os integrantes e com a instituição se os RMs podem ser publicados em um repositório público.
+```text
+backend/.env
+firmware/secrets.h
+senhas Wi-Fi
+tokens
+credenciais privadas
+node_modules
+.venv
+```
 
-## 6. Antes de divulgar
+Confirme que os exemplos públicos usam apenas placeholders.
 
-- Trocar placeholders por integrantes, turma, professor e link Wokwi real.
-- Não divulgar URLs privadas nem credenciais FIWARE/MQTT.
-- Conferir se a licença e os assets estão autorizados para publicação.
-- Marcar claramente o que é demonstração e o que foi validado com hardware.
+## Deploy
+
+- Vercel publica o frontend conectado à branch configurada.
+- Render publica o backend.
+- O FIWARE depende do ambiente AWS/Vocareum estar iniciado.
+- O Render gratuito pode precisar ser acordado antes da apresentação.
+
+## Checklist público
+
+- README atualizado;
+- links do dashboard, backend e Wokwi funcionando;
+- nomes da equipe corretos;
+- arquitetura e manuais atualizados;
+- nenhuma credencial exposta;
+- vídeo final acessível;
+- evidências físicas adicionadas.

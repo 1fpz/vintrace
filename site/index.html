@@ -45,9 +45,9 @@
     <section class="section wrap" id="solucao">
       <div class="section-heading"><div><div class="eyebrow">01 / A SOLUÇÃO</div><h2>Mais visibilidade.<br><em>Menos suposições.</em></h2></div><p>O VinTrace conecta o ambiente físico a uma interface que transforma leituras em contexto — para acompanhar condições, entender variações e responder a anomalias.</p></div>
       <div class="feature-grid">
-        <article class="feature-card"><div class="feature-number">01</div><div class="feature-symbol">⌁</div><h3>Monitoramento contínuo</h3><p>Temperatura, umidade e luminosidade em um só lugar, com estrutura preparada para receber dados de sensores.</p><span class="feature-foot">SENSORES · ESP32</span></article>
+        <article class="feature-card"><div class="feature-number">01</div><div class="feature-symbol">⌁</div><h3>Monitoramento contínuo</h3><p>Temperatura, umidade e luminosidade em um só lugar, com dados enviados pelo ESP32 e integrados ao FIWARE.</p><span class="feature-foot">SENSORES · ESP32</span></article>
         <article class="feature-card"><div class="feature-number">02</div><div class="feature-symbol">◷</div><h3>Histórico com contexto</h3><p>Uma linha do tempo ambiental para investigar oscilações e acompanhar a evolução das condições.</p><span class="feature-foot">DADOS · STH-COMET</span></article>
-        <article class="feature-card"><div class="feature-number">03</div><div class="feature-symbol">↗</div><h3>Alertas configuráveis</h3><p>Limites operacionais e sinalização de anomalias, com caminho de integração para alerta físico e remoto.</p><span class="feature-foot">REGRAS · IOT</span></article>
+        <article class="feature-card"><div class="feature-number">03</div><div class="feature-symbol">↗</div><h3>Alertas configuráveis</h3><p>Limites configuráveis e acionamento remoto de alertas físicos por meio do backend e do FIWARE.</p><span class="feature-foot">REGRAS · IOT</span></article>
       </div>
     </section>
 
@@ -66,10 +66,10 @@
 
     <section class="section wrap architecture" id="arquitetura"><div class="section-heading"><div><div class="eyebrow">03 / ARQUITETURA</div><h2>Do sensor à<br><em>tomada de decisão.</em></h2></div><p>Uma arquitetura em camadas separa hardware, transporte de mensagens, histórico, API e interface. Isso facilita testar cada parte e evoluir a solução com segurança.</p></div>
       <div class="architecture-flow"><article><span>CAMADA 01</span><b>Dispositivo</b><p>ESP32 · DHT-11 · LDR · LED · buzzer</p></article><div class="flow-arrow">→</div><article><span>CAMADA 02</span><b>Conectividade</b><p>Wi-Fi · MQTT · IoT Agent</p></article><div class="flow-arrow">→</div><article><span>CAMADA 03</span><b>Contexto & histórico</b><p>Orion · STH-Comet</p></article><div class="flow-arrow">→</div><article><span>CAMADAS 04–05</span><b>Aplicação</b><p>FastAPI · React dashboard</p></article></div>
-      <div class="architecture-foot"><span>DESENHO DA SOLUÇÃO</span><p>Arquitetura proposta para o projeto acadêmico. A conexão física e o fluxo FIWARE devem ser validados no ambiente da disciplina.</p></div>
+      <div class="architecture-foot"><span>DESENHO DA SOLUÇÃO</span><p>Arquitetura implementada e validada em bancada com ESP32 físico, FIWARE, histórico STH-Comet e dashboard web.</p></div>
     </section>
 
-    <section class="wine-memory"><div class="wrap wine-memory-inner"><div class="wine-icon">✳</div><div><div class="eyebrow">DIFERENCIAL EM EVOLUÇÃO</div><h2>Wine Memory<span>.</span></h2><p>Uma memória ambiental para a adega: relacionar períodos de conservação, alertas e histórico por lote ou garrafa. Uma camada de contexto para ir além do valor instantâneo.</p></div><div class="memory-stamp"><span>VINTRACE</span><b>WINE<br>MEMORY</b><small>CONCEITO</small></div></div></section>
+    <section class="wine-memory"><div class="wrap wine-memory-inner"><div class="wine-icon">✳</div><div><div class="eyebrow">DIFERENCIAL DO PROJETO</div><h2>Wine Memory<span>.</span></h2><p>Um Passaporte Ambiental que interpreta o histórico real do STH-Comet e organiza períodos de exposição, direção da anomalia, duração e pico.</p></div><div class="memory-stamp"><span>VINTRACE</span><b>WINE<br>MEMORY</b><small>PASSAPORTE</small></div></div></section>
 
     <section class="section wrap" id="equipe"><div class="section-heading"><div><div class="eyebrow">04 / EQUIPE</div><h2>Feito em <em>equipe.</em></h2></div><p>Projeto acadêmico CP5 · 2026</p></div><div class="feature-grid team-grid">
         <article class="feature-card team-card"><div class="feature-number">01</div><h3>Felipe Ilek</h3><p>Integrante da equipe VinTrace</p></article>
@@ -80,9 +80,9 @@
         <article class="feature-card team-card"><div class="feature-number">06</div><h3>Lucas Ferreira Rodrigues Silva</h3><p>Integrante da equipe VinTrace</p></article>
       </div><p class="team-privacy-note">Os números de matrícula ficam na documentação acadêmica do repositório, não nesta página pública.</p></section>
 
-    <section class="final-cta wrap"><div><div class="eyebrow">UM PROJETO CP5 · 2026</div><h2>Preservar começa com<br><em>entender o ambiente.</em></h2><p>Conheça a implementação, acompanhe a evolução e explore a documentação do VinTrace.</p></div><div class="cta-actions"><a class="button primary" href="#arquitetura">Explorar arquitetura <span>↗</span></a><a class="button secondary" href="#inicio">Voltar ao topo ↑</a></div></section>
+    <section class="final-cta wrap"><div><div class="eyebrow">UM PROJETO CP5 · 2026</div><h2>Preservar começa com<br><em>entender o ambiente.</em></h2><p>Conheça a implementação integrada, o dashboard operacional e a documentação do VinTrace.</p></div><div class="cta-actions"><a class="button primary" href="https://vintrace-wheat.vercel.app" target="_blank" rel="noreferrer">Abrir dashboard <span>↗</span></a><a class="button secondary" href="#inicio">Voltar ao topo ↑</a></div></section>
   </main>
-  <footer class="footer"><div class="wrap footer-inner"><a class="brand" href="#inicio"><span class="brand-mark">V</span><span>vintrace<span class="brand-dot">.</span></span></a><span>Projeto acadêmico · CP5 · 2026</span><span>Protótipo em desenvolvimento · dados de demo identificados</span></div></footer>
+  <footer class="footer"><div class="wrap footer-inner"><a class="brand" href="#inicio"><span class="brand-mark">V</span><span>vintrace<span class="brand-dot">.</span></span></a><span>Projeto acadêmico · CP5 · 2026</span><span>Sistema integrado · demo local identificada separadamente</span></div></footer>
   <script src="app.js"></script>
 </body>
 </html>

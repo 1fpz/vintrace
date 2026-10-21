@@ -1,4 +1,5 @@
-from typing import Any
+from typing import Any, Literal
+
 from pydantic import BaseModel, Field, model_validator
 
 
@@ -20,7 +21,11 @@ class TriggerConfig(BaseModel):
 
 
 class DeviceRegistration(BaseModel):
-    device_id: str = Field(min_length=1, max_length=80, pattern="^[A-Za-z0-9_-]+$")
+    device_id: str = Field(
+        min_length=1,
+        max_length=80,
+        pattern="^[A-Za-z0-9_-]+$",
+    )
     name: str = Field(min_length=1, max_length=120)
     location: str = Field(default="Adega principal", max_length=120)
 
@@ -51,6 +56,10 @@ class CurrentReading(BaseModel):
 class HistoryPoint(BaseModel):
     time: str
     value: float
+    timestamp: str | None = None
+    min_value: float | None = None
+    max_value: float | None = None
+    samples: int | None = None
 
 
 class HistorySeries(BaseModel):
@@ -68,7 +77,8 @@ class HistoryResponse(BaseModel):
 
 class EnvironmentalIncident(BaseModel):
     id: int
-    type: str  # 'temperature' | 'humidity' | 'luminosity'
+    type: Literal["temperature", "humidity", "luminosity"]
+    direction: Literal["high", "low"]
     title: str
     startedAt: str
     endedAt: str
@@ -80,7 +90,6 @@ class EnvironmentalIncident(BaseModel):
 
 class WineMemoryResponse(BaseModel):
     device_id: str
-    totalIncidents: number = 0 if False else int
     totalIncidents: int = 0
     exposureTime: str = "0 min"
     lastIncident: str = "Nenhum"
@@ -106,5 +115,5 @@ class MonitoringStatus(BaseModel):
 
 class CommandRequest(BaseModel):
     device_id: str = Field(min_length=1, max_length=80)
-    command: str
-    value: str = "on"
+    command: Literal["alertTemp", "alertHum", "alertLum"]
+    value: Literal["high", "low", "off"] = "off"

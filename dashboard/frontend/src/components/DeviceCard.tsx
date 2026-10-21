@@ -9,10 +9,10 @@ import {
   X,
 } from 'lucide-react'
 
-import type { Device } from '../data/mockDevices'
+import type { DeviceItem } from '../services/api'
 
 interface DeviceCardProps {
-  device: Device
+  device: DeviceItem
   onDelete: (id: string) => void
 }
 

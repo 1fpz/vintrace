@@ -1,55 +1,113 @@
 # Infraestrutura FIWARE — VinTrace
 
-Guia completo para configuração, provisionamento e integração do stack FIWARE com o VinTrace.
+## Componentes
 
-## 1. Arquitetura do Stack
+| Serviço | Porta | Função |
+|---|---:|---|
+| Orion Context Broker | 1026 | estado atual e comandos NGSIv2 |
+| IoT Agent UltraLight | 4041 | provisionamento e adaptação UltraLight |
+| Mosquitto | 1883 | transporte MQTT |
+| STH-Comet | 8666 | séries históricas |
+| MongoDB | 27017 | persistência interna do stack |
 
-- **Orion Context Broker**: Porta `1026` — Gerenciador de contexto NGSIv2.
-- **IoT Agent UltraLight 2.0**: Porta `4041` (HTTP de gestão) e MQTT na porta `1883`.
-- **STH-Comet**: Porta `8666` — Histórico de séries temporais.
-- **Mosquitto MQTT**: Porta `1883` — Broker MQTT para comunicação com ESP32 / Wokwi.
-- **MongoDB**: Porta `27017` — Banco de dados subjacente do Orion e STH-Comet.
+## Contrato
 
-## 2. Parâmetros e Padrões Obrigatórios
-
-| Item | Padrão | Observação |
-|---|---|---|
-| **Entity type** | `VinTrace` | Padronizado (não usar WineCellar nem Vintrace) |
-| **Device ID** | `vintrace001` | Pode haver múltiplos dispositivos (`vintrace002`, etc.) |
-| **Entity URN** | `urn:ngsi-ld:VinTrace:001` | Gerado consistentemente pelo backend |
-| **FIWARE-Service** | `smart` | Configurado via `.env` |
-| **FIWARE-ServicePath** | `/` | Configurado via `.env` |
-| **API Key** | `TEF` | Configurado via `.env` |
-| **Telemetria t** | `temperature` | Mapeado no IoT Agent como Number |
-| **Telemetria h** | `humidity` | Mapeado no IoT Agent como Number |
-| **Telemetria l** | `luminosity` | Mapeado no IoT Agent como Number |
-| **Comando alertTemp** | `alertTemp` | Aciona alarme remoto de temperatura no ESP32 (`on`/`off`) |
-| **Comando alertHum** | `alertHum` | Aciona alarme remoto de umidade no ESP32 (`on`/`off`) |
-| **Comando alertLum** | `alertLum` | Aciona alarme remoto de luminosidade no ESP32 (`on`/`off`) |
-
-## 3. Provisionamento Automatizado
-
-Com o backend configurado com as variáveis apontando para a instância FIWARE (localhost ou IP da EC2):
-
-```bash
-# Executar a partir da raiz do repositório
-python infrastructure/fiware/setup_fiware.py
+```text
+FIWARE-Service: smart
+FIWARE-ServicePath: /
+API Key: TEF
+Entity type: VinTrace
+Device principal: vintrace001
+Entity: urn:ngsi-ld:VinTrace:001
 ```
 
-O script realiza:
-1. Verificação de status dos 3 componentes (`/health/fiware`).
-2. Provisionamento do Service Group (`/iot/services`) com API Key `TEF`.
-3. Provisionamento da Subscription no Orion para que alterações de `temperature`, `humidity` e `luminosity` sejam enviadas ao STH-Comet (`http://sth-comet:8666/notify`).
-4. Registro do dispositivo de teste `vintrace001`.
+Atributos:
 
-## 4. Tópicos MQTT do IoT Agent UltraLight
+```text
+t → temperature
+h → humidity
+l → luminosity
+```
 
-- **Publicação de Telemetria (ESP32 -> IoT Agent)**:
-  - Tópico: `/TEF/{device_id}/attrs` (ex: `/TEF/vintrace001/attrs`)
-  - Payload UltraLight: `t|14.2|h|68.0|l|12`
-- **Comandos Remotos (IoT Agent -> ESP32)**:
-  - Tópico: `/TEF/{device_id}/cmd` (ex: `/TEF/vintrace001/cmd`)
-  - Payload UltraLight: `{device_id}@{command}|{value}` (ex: `vintrace001@alertTemp|on`)
-- **Confirmação de Execução de Comando (ESP32 -> IoT Agent)**:
-  - Tópico: `/TEF/{device_id}/cmdexe`
-  - Payload: `{device_id}@{command}|{command} OK`
+Comandos:
+
+```text
+alertTemp
+alertHum
+alertLum
+```
+
+Valores:
+
+```text
+high
+low
+off
+```
+
+## MQTT UltraLight
+
+Telemetria:
+
+```text
+/ul/TEF/{device_id}/attrs
+```
+
+Exemplo:
+
+```text
+t|25.8|h|53|l|52
+```
+
+Comandos:
+
+```text
+/TEF/{device_id}/cmd
+```
+
+Resultado de comando:
+
+```text
+/ul/TEF/{device_id}/cmdexe
+```
+
+## Triggers
+
+Em produção, os limites são persistidos como atributos do próprio dispositivo no Orion:
+
+```text
+triggerTemperatureMin
+triggerTemperatureMax
+triggerHumidityMin
+triggerHumidityMax
+triggerLuminosityMin
+triggerLuminosityMax
+```
+
+Configuração do backend:
+
+```env
+TRIGGER_STORAGE=fiware
+```
+
+## Histórico
+
+O Orion envia alterações ao STH-Comet por Subscription. A API do VinTrace consulta o histórico pela porta 8666 e expõe períodos de 24h, 7d e 30d ao frontend.
+
+## Health checks
+
+```text
+GET :1026/version
+GET :4041/iot/about
+GET :8666/version
+```
+
+Ou pelo backend:
+
+```text
+GET /health/fiware
+```
+
+## Observação de segurança
+
+O stack é utilizado como ambiente acadêmico de prova de conceito. Não exponha credenciais reais no Git e mantenha MongoDB restrito sempre que possível.
