@@ -1,32 +1,108 @@
 # Manual de montagem e operação — hardware
 
-## Materiais
+## 1. Componentes
 
-ESP32, sensor DHT-11, LDR, resistor para divisor de tensão, LED azul (e resistor limitador se externo), buzzer, protoboard, jumpers e cabo USB de dados.
+- ESP32 DOIT DevKit V1 / ESP32-WROOM-32
+- DHT11 físico
+- LDR + resistor para divisor de tensão
+- TFT ST7735 1,8" 128×160
+- LED azul externo + resistor limitador
+- buzzer passivo
+- protoboard e jumpers
+- cabo USB
 
-## Montagem de referência
+## 2. Pinagem final
 
-- DHT-11: VCC/GND e DATA no GPIO 4.
-- LDR: montar divisor de tensão; ponto médio no GPIO 34.
-- LED azul: GPIO 2 se compatível com a placa ou LED externo com resistor apropriado.
-- Buzzer: GPIO 25; use driver se a corrente exceder o permitido pelo GPIO.
-- Compartilhar GND entre os módulos.
+| Componente | ESP32 |
+|---|---:|
+| DHT11 DATA | GPIO 4 |
+| LDR | GPIO 34 |
+| TFT SCK | GPIO 18 |
+| TFT MOSI | GPIO 23 |
+| TFT CS | GPIO 21 |
+| TFT DC | GPIO 16 |
+| TFT RST | GPIO 17 |
+| LED azul | GPIO 27 |
+| Buzzer passivo | GPIO 25 |
 
-**Desligue a alimentação antes de alterar a fiação.** Confirme a pinagem do módulo e a tensão suportada pelo componente comprado; módulos variam.
+Todos os módulos devem compartilhar GND.
 
-## Firmware
+## 3. LDR
 
-Siga `firmware/README.md`. A rede Wi-Fi e o broker são configurados em `firmware/secrets.h`, arquivo local ignorado pelo Git.
+O LDR usa entrada analógica no GPIO 34. No firmware final, a escala percentual é calculada por:
 
-## Teste físico sugerido
+```cpp
+map(ldrRaw, 0, 4095, 100, 0)
+```
 
-1. Energizar ESP32 e observar a inicialização no Serial Monitor (115200 baud).
-2. Confirmar conexão Wi-Fi/MQTT.
-3. Comparar leituras do DHT com a condição ambiente e testar resposta do LDR com mais/menos luz.
-4. Publicar `BUZZER_TEST` no tópico de comando.
-5. Forçar uma anomalia controlada (sem danificar o hardware) e confirmar padrão sonoro/LED.
-6. Restaurar o ambiente e confirmar que o LED para apenas quando todos os parâmetros estão dentro das faixas.
-7. Confirmar o histórico no STH-Comet e o mesmo intervalo no dashboard.
-8. Registrar fotos e vídeo contínuo mostrando dispositivo, mensagens e dashboard.
+Isso foi ajustado ao sentido do divisor usado no protótipo físico.
 
-Não declare um teste aprovado sem evidência observada.
+## 4. Display TFT
+
+O ST7735 é utilizado em modo paisagem, resolução lógica 160×128.
+
+A tela apresenta:
+
+- valores atuais;
+- estado `NORMAL`;
+- temperatura alta ou baixa;
+- umidade alta ou baixa;
+- luminosidade alta ou baixa;
+- lista de alertas quando há mais de uma anomalia.
+
+## 5. Alertas físicos
+
+Enquanto houver pelo menos uma anomalia:
+
+- o LED azul no GPIO 27 pisca;
+- o buzzer toca de forma não bloqueante;
+- a TFT mostra a condição detectada.
+
+Frequências:
+
+| Sensor | Frequência |
+|---|---:|
+| Temperatura | 700 Hz |
+| Umidade | 1100 Hz |
+| Luminosidade | 1600 Hz |
+
+Quando existem vários alertas, os sons são alternados.
+
+## 6. Inicialização
+
+1. Energize o ESP32.
+2. A TFT mostra `VinTrace / Wine Guardian / Conectando...`.
+3. O firmware conecta ao Wi-Fi.
+4. Em seguida conecta ao MQTT.
+5. Faz a primeira leitura dos sensores.
+6. Mostra a tela operacional.
+
+Se o dispositivo ficar em `Conectando...` após reconectar o USB, pressione `EN/RESET` e acompanhe o Serial Monitor em 115200 baud.
+
+## 7. Teste físico
+
+1. Confirme que o dispositivo aparece online no dashboard.
+2. Observe temperatura, umidade e luminosidade.
+3. Altere um trigger no frontend para provocar uma anomalia.
+4. Confirme TFT, LED e buzzer.
+5. Retorne o trigger para uma faixa segura.
+6. Confirme que o comando `off` normaliza o dispositivo.
+7. Repita para as três variáveis.
+8. Teste múltiplas anomalias simultâneas.
+
+Faixa segura utilizada após os ensaios:
+
+```text
+Temperatura: 0–50 °C
+Umidade: 0–100%
+Luminosidade: 0–100%
+```
+
+## 8. Segurança de montagem
+
+- desligue a alimentação antes de alterar a fiação;
+- utilize resistor limitador no LED externo;
+- mantenha GND comum;
+- deixe o DHT11 ventilado;
+- evite que a luz do próprio display/LED interfira diretamente no LDR;
+- preserve acesso ao USB e ao botão EN/RESET na carcaça.

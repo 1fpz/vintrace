@@ -1,18 +1,89 @@
-# Plano de testes e evidências
+# Plano de testes e evidências — VinTrace
 
-| ID | Teste | Critério de aprovação | Evidência a guardar | Estado inicial |
-|---|---|---|---|---|
-| T01 | API health | `/health` retorna `status=ok` | captura de tela/terminal | Preparado |
-| T02 | Cadastro de dispositivo | ID duplicado é rejeitado | requisição e resposta | Preparado |
-| T03 | Validação de trigger | `min >= max` é rejeitado | resposta 422 | Preparado |
-| T04 | Leitura STH-Comet | dados vêm da entidade/atributo correto | resposta JSON + dashboard | Pendente FIWARE |
-| T05 | DHT-11 | temperatura/umidade mudam de modo plausível | Serial Monitor | Pendente hardware |
-| T06 | LDR | leitura reage a alteração de iluminação | Serial Monitor | Pendente hardware |
-| T07 | Buzzer | padrões diferentes por anomalia | vídeo | Pendente hardware |
-| T08 | LED azul | pisca até todas as faixas normalizarem | vídeo | Pendente hardware |
-| T09 | Comando remoto | ação do frontend/API chega ao ESP32 | log MQTT + vídeo | Pendente integração |
-| T10 | Histórico | gráfico reflete valores do STH-Comet | dashboard + resposta API | Pendente integração |
-| T11 | Wokwi | DHT-22 + LDR simulados e link acessível | URL pública | Pendente Wokwi |
-| T12 | Publicação | site abre em URL pública sem segredo exposto | URL pública | Pendente deploy |
+Os estados abaixo refletem os ensaios executados durante a integração final. Evidências visuais serão organizadas na pasta `docs/evidencias/` na etapa final de entrega.
 
-Use o estado `Aprovado` somente depois de executar o teste. Guarde evidências em `docs/evidencias/` sem dados pessoais ou segredos.
+| ID | Teste | Critério | Estado |
+|---|---|---|---|
+| T01 | Firmware compila e faz upload | sem erro no ESP32 | **Aprovado** |
+| T02 | DHT11 físico | temperatura e umidade plausíveis | **Aprovado** |
+| T03 | LDR físico | valor reage à iluminação | **Aprovado** |
+| T04 | Wokwi DHT22 + LDR | link público e alertas funcionais | **Aprovado** |
+| T05 | Provisionamento | dispositivo criado no IoT Agent/Orion | **Aprovado** |
+| T06 | Estado atual | `temperature`, `humidity`, `luminosity` atualizam no Orion | **Aprovado** |
+| T07 | Histórico STH | dados disponíveis pela porta 8666 | **Aprovado** |
+| T08 | CRUD de dispositivos | cadastro e exclusão reais | **Aprovado** |
+| T09 | Dashboard de dispositivos | listagem usa FIWARE real | **Aprovado** |
+| T10 | Gráficos | 24h, 7d e 30d usam STH-Comet | **Aprovado** |
+| T11 | Triggers | limites editáveis e persistidos no Orion | **Aprovado** |
+| T12 | Temperatura | comando remoto + LED + buzzer + TFT | **Aprovado** |
+| T13 | Umidade | comando remoto + LED + buzzer + TFT | **Aprovado** |
+| T14 | Luminosidade | comando remoto + LED + buzzer + TFT | **Aprovado** |
+| T15 | Normalização | `off` encerra o alerta normalizado | **Aprovado** |
+| T16 | Anomalias simultâneas | alertas restantes continuam ativos | **Aprovado** |
+| T17 | Reconexão | ESP32 volta após reset/reconexão | **Aprovado em bancada** |
+| T18 | TFT | tela normal, alertas individuais e múltiplos legíveis | **Aprovado** |
+| T19 | Wine Memory | incidente real calculado pelo histórico | **Aprovado** |
+| T20 | Encapsulamento | montagem final segura e acessível | **A documentar** |
+| T21 | Manuais/Git/arquitetura | documentação reproduzível | **Em finalização** |
+| T22 | Vídeo/Forms/pitch | links finais e entrega | **Pendente da etapa de evidências** |
+
+## Resultados técnicos registrados
+
+### Backend
+
+```text
+pytest -q
+8 passed
+```
+
+### Frontend
+
+```text
+npm run lint
+aprovado
+
+npm run build
+aprovado
+```
+
+### Health FIWARE
+
+Durante a integração final:
+
+```text
+Orion: online
+IoT Agent: online
+STH-Comet: online
+overall: healthy
+```
+
+### Histórico
+
+Exemplo de retorno observado:
+
+```text
+24h: 98 pontos por série
+7d: 8 pontos por série
+30d: 8 pontos por série
+source: sth-comet
+```
+
+A quantidade depende do tempo de telemetria realmente existente no STH-Comet.
+
+### Wine Memory
+
+Foi validado incidente de temperatura com:
+
+```text
+direction: high
+```
+
+Depois do ensaio, os triggers foram devolvidos para uma faixa segura.
+
+### Wokwi
+
+Link público:
+
+https://wokwi.com/projects/478447086402895873
+
+Foram testados temperatura, umidade e luminosidade, cada uma com frequência sonora diferente.

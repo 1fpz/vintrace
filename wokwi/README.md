@@ -1,29 +1,45 @@
-# Simulação Wokwi — VinTrace CP5
+# Simulação Wokwi — VinTrace
 
-Simulação do requisito oficial do CP5 usando:
+Projeto público:
 
-- ESP32 DevKit v4
-- DHT22 no GPIO 4
-- LDR no GPIO 34
-- LED azul no GPIO 27
-- Buzzer no GPIO 25
+https://wokwi.com/projects/478447086402895873
 
-O DHT22 é usado somente na simulação Wokwi. No hardware físico, o VinTrace utiliza DHT11.
+A simulação atende ao requisito do CP5 de utilizar **DHT22 + LDR**.
 
-## Teste
+## Componentes
 
-1. Abra o projeto no Wokwi.
-2. Inicie a simulação.
-3. Altere temperatura e umidade no DHT22.
-4. Altere a luminosidade no fotoresistor.
-5. Verifique o Serial Monitor, o LED azul e o buzzer.
+- ESP32
+- DHT22
+- LDR
+- LED azul
+- buzzer passivo
 
-Os alertas usam os mesmos limites padrão do projeto e sons distintos para temperatura, umidade e luminosidade.
+## Pinagem da simulação
 
-## Link público
+```text
+DHT22 DATA  GPIO 4
+LDR         GPIO 34
+LED azul    GPIO 27
+Buzzer      GPIO 25
+```
 
-Após publicar o projeto no Wokwi, inserir aqui:
+## Alertas
 
-`WOKWI_LINK_PENDENTE`
+A simulação usa frequências alinhadas ao firmware físico:
 
-O link também deve ser colocado no README principal e no formulário de entrega.
+```text
+Temperatura  700 Hz
+Umidade      1100 Hz
+Luminosidade 1600 Hz
+```
+
+Foram testadas as três variáveis individualmente e os sons foram confirmados como diferentes.
+
+Arquivos locais:
+
+```text
+wokwi/vintrace-simulation/sketch.ino
+wokwi/vintrace-simulation/diagram.json
+wokwi/vintrace-simulation/libraries.txt
+wokwi/vintrace-simulation/wokwi.toml
+```
