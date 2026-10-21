@@ -255,7 +255,7 @@ class AnomalyMonitor:
             )
             return
 
-        triggers = get_device_triggers(
+        triggers = await get_device_triggers(
             device_id
         )
 

@@ -2,11 +2,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.triggers_store import (
-    get_device_triggers,
-    save_device_triggers,
-    delete_device_triggers,
-)
+from app.triggers_store import delete_device_triggers
 from app.models import TriggerConfig, SensorRange, HistorySeries, HistoryPoint
 from app.fiware import device_id_to_urn, urn_to_device_id, calculate_wine_memory
 
@@ -97,6 +93,8 @@ def test_wine_memory_calculation():
     assert wm.device_id == dev_id
     assert wm.totalIncidents >= 1
     assert wm.stability < 100.0
+    assert {incident.direction for incident in wm.incidents} <= {"high", "low"}
+    assert any(incident.direction == "high" for incident in wm.incidents)
 
 
 def test_monitoring_endpoints():
