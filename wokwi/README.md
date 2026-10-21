@@ -1,15 +1,29 @@
-# Simulação Wokwi — DHT-22 + LDR
+# Simulação Wokwi — VinTrace CP5
 
-A pasta `vintrace-simulation/` contém o sketch e um diagrama inicial para ESP32, DHT-22, fotoresistor, LED azul e buzzer.
+Simulação do requisito oficial do CP5 usando:
 
-## Como criar o link compartilhável
+- ESP32 DevKit v4
+- DHT22 no GPIO 4
+- LDR no GPIO 34
+- LED azul no GPIO 27
+- Buzzer no GPIO 25
 
-1. Acesse https://wokwi.com/projects/new/esp32.
-2. Copie o conteúdo de `vintrace-simulation/sketch.ino` para o editor.
-3. Recrie/importa o circuito conforme `diagram.json` (a sintaxe de componentes/pinos pode precisar de ajuste no editor Wokwi).
-4. Em Libraries, adicione `DHT sensor library` e `Adafruit Unified Sensor`.
-5. Inicie a simulação e abra o Serial Monitor.
-6. Altere temperatura/umidade do DHT-22 e a luminosidade do fotoresistor; observe alertas.
-7. Use Share e copie o link público gerado para o README e Microsoft Forms.
+O DHT22 é usado somente na simulação Wokwi. No hardware físico, o VinTrace utiliza DHT11.
 
-**Este repositório não contém um link Wokwi já publicado.** O link só existe após criar/salvar o projeto na conta da equipe e confirmar que abre sem login obrigatório.
+## Teste
+
+1. Abra o projeto no Wokwi.
+2. Inicie a simulação.
+3. Altere temperatura e umidade no DHT22.
+4. Altere a luminosidade no fotoresistor.
+5. Verifique o Serial Monitor, o LED azul e o buzzer.
+
+Os alertas usam os mesmos limites padrão do projeto e sons distintos para temperatura, umidade e luminosidade.
+
+## Link público
+
+Após publicar o projeto no Wokwi, inserir aqui:
+
+`WOKWI_LINK_PENDENTE`
+
+O link também deve ser colocado no README principal e no formulário de entrega.

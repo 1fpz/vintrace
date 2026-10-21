@@ -4,7 +4,7 @@
  *   - ESP32 DevKit v4
  *   - DHT22 (temperatura e umidade) no GPIO 4
  *   - LDR (fotoresistor) no GPIO 34
- *   - LED Azul de Alerta no GPIO 2
+ *   - LED Azul de Alerta no GPIO 27
  *   - Buzzer no GPIO 25
  *
  * Padrões de Thresholds (Defaults VinTrace):
@@ -18,7 +18,7 @@
 #define DHTPIN 4
 #define DHTTYPE DHT22
 #define LDRPIN 34
-#define LEDPIN 2
+#define LEDPIN 27
 #define BUZZERPIN 25
 
 DHT dht(DHTPIN, DHTTYPE);
@@ -94,19 +94,19 @@ void loop() {
       lastSoundCycle = now;
       int activeList[3];
       int count = 0;
-      if (tempAnomaly) activeList[count++] = 1; // 1800 Hz (Temperatura)
-      if (humAnomaly) activeList[count++] = 2;  // 1200 Hz (Umidade)
-      if (lumAnomaly) activeList[count++] = 3;  // 800 Hz  (Luminosidade)
+      if (tempAnomaly) activeList[count++] = 1; // 700 Hz (Temperatura)
+      if (humAnomaly) activeList[count++] = 2;  // 1100 Hz (Umidade)
+      if (lumAnomaly) activeList[count++] = 3;  // 1600 Hz (Luminosidade)
 
       if (count > 0) {
         soundCycleIndex = (soundCycleIndex + 1) % count;
         int currentType = activeList[soundCycleIndex];
         if (currentType == 1) {
-          tone(BUZZERPIN, 1800, 220); // Agudo / intermitente
+          tone(BUZZERPIN, 700, 220); // Temperatura
         } else if (currentType == 2) {
-          tone(BUZZERPIN, 1200, 420); // Medio
+          tone(BUZZERPIN, 1100, 420); // Umidade
         } else if (currentType == 3) {
-          tone(BUZZERPIN, 800, 650);  // Grave
+          tone(BUZZERPIN, 1600, 650);  // Luminosidade
         }
       }
     }
